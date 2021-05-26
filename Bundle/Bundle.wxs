@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi"
+     xmlns:bal="http://schemas.microsoft.com/wix/BalExtension"
+     xmlns:dep='http://schemas.microsoft.com/wix/DependencyExtension'
+     xmlns:util='http://schemas.microsoft.com/wix/UtilExtension'
+     xmlns:netfx='http://schemas.microsoft.com/wix/NetFxExtension'
+>
+  <!-- TODO: include proper version information. -->
+  <Bundle Name="Ceph Bundle"
+          Version="1.0.0.0"
+          Manufacturer="Ceph"
+          UpgradeCode="D9863E52-8D39-49B8-852A-2F2D86317A7E"
+          DisableModify="yes">
+    <BootstrapperApplicationRef Id="WixStandardBootstrapperApplication.RtfLicense">
+      <bal:WixStandardBootstrapperApplication
+        ShowVersion="yes"
+        SuppressOptionsUI="no"
+        SuppressRepair="yes"
+        LicenseFile="..\License.rtf"/>
+    </BootstrapperApplicationRef>
+
+<!--     <bal:Condition Message="Ceph requires Windows Server 2016 or later."><![CDATA[Installed OR VersionNT > v10.0]]></bal:Condition> -->
+
+    <Chain>
+      <!--  TODO: consider hiding the internal UI and provide an
+            unified dialog. The downside is that we'll have to pick up
+            new properties. -->
+      <!-- TODO: make dokan optional, also skip it if it's
+           already installed -->
+      <MsiPackage SourceFile="..\binaries\Dokan_x64.msi"
+                  EnableFeatureSelection="yes"
+                  Compressed="yes"
+                  Visible="yes"
+                  DisplayInternalUI="yes">
+        <!--<MsiProperty Name="ADDLOCAL" Value="ALL" />-->
+        <MsiProperty Name="MSIUNINSTALLSUPERSEDEDCOMPONENTS" Value="1"/>
+      </MsiPackage>
+
+      <MsiPackage SourceFile="..\bin\$(var.Configuration)\Ceph.msi"
+                  EnableFeatureSelection="yes"
+                  Compressed="yes"
+                  Visible="yes"
+                  DisplayInternalUI="yes">
+        <!--<MsiProperty Name="ADDLOCAL" Value="ALL" />-->
+        <MsiProperty Name="MSIUNINSTALLSUPERSEDEDCOMPONENTS" Value="1"/>
+      </MsiPackage>
+
+    </Chain>
+  </Bundle>
+</Wix>
